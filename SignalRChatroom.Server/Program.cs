@@ -1,3 +1,13 @@
+using Mapster;
+using MapsterMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using SignalRChatroom.Server;
+using SignalRChatroom.Server.Contracts;
+using SignalRChatroom.Server.Persistence;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -6,9 +16,36 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowAnyOrigin();
+    });
+});
+builder.Services.AddMapster();
 
 //configure SignalR service
 builder.Services.AddSignalR();
+
+//configure db
+if (builder.Environment.IsDevelopment())
+    builder.Services.AddDbContext<SignalRChatroomDbContext>((provider, optionsBuilder) =>
+    {
+        var connectionString = builder.Configuration.GetConnectionString("Database");
+        optionsBuilder.UseNpgsql(connectionString);
+    });
+else
+    builder.Services.AddDbContext<SignalRChatroomDbContext>((provider, optionsBuilder) =>
+    {
+        var connectionString = builder.Configuration["DB_CONNECTION"];
+        optionsBuilder.UseNpgsql(connectionString);
+    });
+
+//dep injections
+builder.Services.AddScoped<IChatRepository, ChatRepository>();
 
 var app = builder.Build();
 
@@ -23,4 +60,40 @@ app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
+app.MapHub<ChatHub>("/chatroom");
+
+//minimal api
+app.MapGet(
+    "messages",
+    async (
+        IChatRepository chatRepository,
+        IMapper mapper) =>
+    {
+        var result = await chatRepository.GetAll();
+
+        return Results.Ok(mapper.Map<List<ChatResponse>>(result));
+    }
+);
+
+app.MapPost(
+    "message", 
+    async (
+        [FromBody] InsertChatRequest request,
+        IHubContext<ChatHub, IChatHubMethods> context,
+        IChatRepository chatRepository) =>
+    {
+        var chat = new Chat
+        {
+            Username = request.Username,
+            Message = request.Message
+        };
+
+        await chatRepository.InsertAsync(chat);
+        await context.Clients.All.InsertChat(chat.Username, chat.Message);
+
+        return Results.NoContent();
+    }
+);
+
 app.Run();
