@@ -1,0 +1,25 @@
+services:
+  server:
+    image: "signalrchatroomserver:prod"
+    environment:
+      - DB_CONNECTION=Server=host.docker.internal;Port=5433;Database=postgres;User Id=postgres;Password=postgres;
+    ports:
+      - "8080:8080"
+    command: bash -c "dotnet-ef database update"
+    depends_on:
+      db:
+        condition: service_healthy
+        restart: true
+
+  db:
+    image: "ankane/pgvector:v0.4.4"
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      start_period: 30s
