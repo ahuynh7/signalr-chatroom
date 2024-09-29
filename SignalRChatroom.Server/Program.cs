@@ -18,11 +18,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
+    //cors policy to allow websocket connection
+    options.AddPolicy("SignalRCorsPolicy", builder =>
     {
         builder.AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowAnyOrigin();
+            .AllowCredentials()
+            .WithOrigins("http://localhost:3000");
     });
 });
 builder.Services.AddMapster();
@@ -56,7 +58,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseCors();
+app.UseCors("SignalRCorsPolicy");
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
@@ -90,7 +92,11 @@ app.MapPost(
         };
 
         await chatRepository.InsertAsync(chat);
-        await context.Clients.All.InsertChat(chat.Username, chat.Message);
+        await context.Clients.All.InsertChat(
+            chat.Timestamp, 
+            chat.Username,
+            chat.Message
+        );
 
         return Results.NoContent();
     }

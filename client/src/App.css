@@ -1,0 +1,31 @@
+/* styles.css */
+.chatbox {
+  width: 400px;
+  max-height: 600px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+}
+
+.chat-message {
+  margin-bottom: 15px;
+}
+
+.chat-message-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.chat-message-username {
+  font-weight: bold;
+}
+
+.chat-message-timestamp {
+  font-size: 0.8em;
+  color: #888;
+}
+
+.chat-message-content {
+  font-size: 1em;
+}

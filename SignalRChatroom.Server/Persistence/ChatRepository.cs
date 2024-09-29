@@ -21,7 +21,7 @@ public class ChatRepository : IChatRepository
     {
         //fetch 15 most recent chats
         return await _dbContext.Chats
-            .OrderBy(c => c.Timestamp)
+            .OrderByDescending(c => c.Timestamp)
             .Take(15)
             .ToListAsync();
     }
