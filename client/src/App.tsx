@@ -16,9 +16,10 @@ function App() {
 
   useEffect(() => {
     const connection = new signalR.HubConnectionBuilder()
-      .withUrl(`${process.env.REACT_APP_API_URL}/chatroom`)
       .withAutomaticReconnect()
       .build();
+
+    connection.baseUrl = `${process.env.REACT_APP_API_URL}/chatroom`;
 
     setConnection(connection);
   }, []);
