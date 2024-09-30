@@ -3,7 +3,7 @@ import { ChatResponse } from "../App";
 import axios from "axios";
 
 const getMessages = async () => 
-  await axios.get(`${process.env.REACT_APP_API_URL}/messages`)
+  await axios.get(`http://${process.env.REACT_APP_API_URL}/messages`)
 
 const useFetchMessages = () => {
   const [messages, setMessages] = useState<ChatResponse[]>([]);

@@ -16,6 +16,7 @@ function App() {
 
   useEffect(() => {
     const connection = new signalR.HubConnectionBuilder()
+      .withUrl("/chatroom")
       .withAutomaticReconnect()
       .build();
 
