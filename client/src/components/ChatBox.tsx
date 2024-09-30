@@ -55,7 +55,7 @@ const Chatbox = ({messages}: {messages: ChatResponse[]}) => {
         <input
           type="text"
           className="chatbox-input"
-          placeholder="Type your username..."
+          placeholder="Type your username... no profanity! >.<"
           value={username}
           onChange={e => setUsername(e.target.value)}
           maxLength={21}
