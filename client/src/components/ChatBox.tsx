@@ -39,7 +39,7 @@ const Chatbox = ({messages}: {messages: ChatResponse[]}) => {
         message: inputValue
       }
 
-      await axios.post(`http://${process.env.REACT_APP_API_URL}/message`, request);
+      await axios.post(`${process.env.REACT_APP_API_URL}/message`, request);
     }
   };
 
