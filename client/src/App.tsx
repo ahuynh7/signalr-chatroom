@@ -15,6 +15,7 @@ function App() {
   const [connection, setConnection] = useState<signalR.HubConnection>();
 
   useEffect(() => {
+    //create signalr connection
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${process.env.REACT_APP_API_URL}/chatroom`)
       .withAutomaticReconnect()
@@ -27,9 +28,9 @@ function App() {
     if (connection) {
       connection.start()
         .then(() => {
-          connection.on("InsertChat", (datetime: string, user: string, message: string) => {
+          connection.on("InsertChat", (timestamp: string, user: string, message: string) => {
             let chat: ChatResponse = {
-              timestamp: new Date(datetime).getTime(),//todo: temp
+              timestamp: new Date(timestamp).getTime(),
               username: user,
               message: message
             };

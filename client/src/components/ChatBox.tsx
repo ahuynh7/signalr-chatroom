@@ -30,7 +30,7 @@ const Chatbox = ({messages}: {messages: ChatResponse[]}) => {
 
   const handleSendMessage = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (inputValue.trim() !== '') {
+    if (inputValue.trim() !== '' && username.trim() !== '') {
       setInputValue('');
       setCharCount(250);
     

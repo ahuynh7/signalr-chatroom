@@ -10,11 +10,11 @@ const useFetchMessages = () => {
 
   useEffect(() => {
     //fetch past messages
-    getMessages()
-      .then((response) => {
-        if (messages.length === 0)
-          setMessages(response.data.reverse());
-      });
+    if (messages.length === 0)
+      getMessages()
+        .then((response) => {
+            setMessages(response.data.reverse());
+        });
   }, [messages.length]);
 
   return { messages, setMessages };
