@@ -4,8 +4,9 @@ namespace SignalRChatroom.Server.Persistence;
 
 public interface IChatRepository
 {
-    Task<IList<Chat>> GetAll();
+    Task<IList<Chat>> GetRecent();
     Task<Guid> InsertAsync(Chat chat);
+    Task<bool> DeleteAll();
 }
 
 public class ChatRepository : IChatRepository
@@ -17,7 +18,7 @@ public class ChatRepository : IChatRepository
         _dbContext = dbContext;
     }
 
-    public async Task<IList<Chat>> GetAll()
+    public async Task<IList<Chat>> GetRecent()
     {
         //fetch 15 most recent chats
         return await _dbContext.Chats
@@ -33,5 +34,12 @@ public class ChatRepository : IChatRepository
         await _dbContext.SaveChangesAsync();
 
         return id.Entity.ChatId;
+    }
+
+    public async Task<bool> DeleteAll()
+    {
+        _dbContext.Chats.RemoveRange(_dbContext.Chats);
+
+        return await _dbContext.SaveChangesAsync() > 0;
     }
 }

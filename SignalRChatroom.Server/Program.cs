@@ -1,6 +1,5 @@
 using Mapster;
 using MapsterMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -72,7 +71,7 @@ app.MapGet(
         IChatRepository chatRepository,
         IMapper mapper) =>
     {
-        var result = await chatRepository.GetAll();
+        var result = await chatRepository.GetRecent();
 
         return Results.Ok(mapper.Map<List<ChatResponse>>(result));
     }
@@ -91,14 +90,28 @@ app.MapPost(
             Message = request.Message
         };
 
-        await chatRepository.InsertAsync(chat);
+        var result = await chatRepository.InsertAsync(chat);
         await context.Clients.All.InsertChat(
             chat.Timestamp, 
             chat.Username,
             chat.Message
         );
 
-        return Results.NoContent();
+        return result != Guid.Empty
+            ? Results.Created()
+            : Results.Problem();
+    }
+);
+
+app.MapDelete(
+    "messages",
+    async (IChatRepository chatRepository) =>
+    {
+        var result = await chatRepository.DeleteAll();
+
+        return result
+            ? Results.NoContent()
+            : Results.Problem();
     }
 );
 
