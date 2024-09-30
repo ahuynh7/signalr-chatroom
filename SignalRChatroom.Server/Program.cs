@@ -24,7 +24,7 @@ builder.Services.AddCors(options =>
         builder.AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials()
-            .WithOrigins("http://localhost:3000");
+            .WithOrigins("http://localhost:3000", "http://44.243.182.113");
     });
 });
 builder.Services.AddMapster();

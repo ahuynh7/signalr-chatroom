@@ -1,7 +1,7 @@
 import { ChatResponse } from '../App';
 import Chat from './Chat';
-import { ChangeEvent, FormEvent, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import axios from 'axios';
+import { ChangeEvent, FormEvent, useLayoutEffect, useRef, useState } from 'react';
+import axios from "axios";
 
 interface ChatRequest {
     username: string;
@@ -39,7 +39,7 @@ const Chatbox = ({messages}: {messages: ChatResponse[]}) => {
         message: inputValue
       }
 
-      await axios.post(`${process.env.REACT_APP_API_URL}/message`, request);
+      await axios.post(`http://${process.env.REACT_APP_API_URL}/message`, request);
     }
   };
 
