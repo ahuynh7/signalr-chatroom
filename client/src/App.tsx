@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import './App.css';
-import axios from "axios";
 import * as signalR from '@microsoft/signalr';
 import Chatbox from './components/ChatBox';
+import useFetchMessages from './hooks/useFetchMessages';
 
 export interface ChatResponse {
   timestamp: number;
@@ -10,15 +10,11 @@ export interface ChatResponse {
   message: string;
 }
 
-const getMessages = async () => 
-  await axios.get(`http://${process.env.REACT_APP_API_URL}/messages`)
-
 function App() {
+  const { messages, setMessages } = useFetchMessages();
   const [connection, setConnection] = useState<signalR.HubConnection>();
-  const [messages, setMessages] = useState<ChatResponse[]>([]);
 
   useEffect(() => {
-    //establish connection signalr hub server
     const connection = new signalR.HubConnectionBuilder()
       .withUrl(`${process.env.REACT_APP_API_URL}/chatroom`)
       .withAutomaticReconnect()
@@ -28,21 +24,12 @@ function App() {
   }, []);
 
   useEffect(() => {
-    //fetch past messages
-    getMessages()
-      .then((response) => {
-        if (messages.length === 0)
-          setMessages(response.data.reverse());
-      });
-  }, [messages.length]);
-
-  useEffect(() => {
     if (connection) {
       connection.start()
         .then(() => {
-          connection.on("InsertChat", (timestamp: string, user: string, message: string) => {
+          connection.on("InsertChat", (datetime: string, user: string, message: string) => {
             let chat: ChatResponse = {
-              timestamp: new Date(timestamp).getTime(),
+              timestamp: new Date(datetime).getTime(),//todo: temp
               username: user,
               message: message
             };
@@ -52,7 +39,8 @@ function App() {
         })
         .catch((error) => console.error(error));
     }
-   }, [connection]);
+   }, [connection, setMessages]);
+
   return (
     <div className="App">
       <Chatbox messages={messages} />
