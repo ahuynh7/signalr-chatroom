@@ -9,6 +9,7 @@ interface ChatRequest {
 }
 
 const Chatbox = ({messages}: {messages: ChatResponse[]}) => {
+  const [username, setUsername] = useState("");
   const [inputValue, setInputValue] = useState("");
   const [charCount, setCharCount] = useState(250);
   const chatboxRef = useRef<HTMLDivElement | null>(null);
@@ -35,7 +36,7 @@ const Chatbox = ({messages}: {messages: ChatResponse[]}) => {
     
       //send post request to insert chat message
       let request: ChatRequest = {
-        username: "user",
+        username: username,
         message: inputValue
       }
 
@@ -52,6 +53,13 @@ const Chatbox = ({messages}: {messages: ChatResponse[]}) => {
       </div>
       <form className="chatbox-input-container" onSubmit={handleSendMessage}>
         <input
+          type="text"
+          className="chatbox-input"
+          placeholder="Type your username..."
+          value={username}
+          onChange={e => setUsername(e.target.value)}
+          maxLength={21}
+        /><input
           type="text"
           className="chatbox-input"
           placeholder="Type your message..."
